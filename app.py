@@ -1657,9 +1657,9 @@ with tabsimulation:
             st.session_state.battery_cost_per_kwh = 220
 
         def set_xlarge():
-            st.session_state.battery_capacity = 645
-            st.session_state.power_rating = 300
-            st.session_state.battery_cost_per_kwh = 220
+            st.session_state.battery_capacity = 500
+            st.session_state.power_rating = 1000
+            st.session_state.battery_cost_per_kwh = 400
 
 
         def set_custom():
@@ -1679,7 +1679,7 @@ with tabsimulation:
                     st.button("Voltfang (90 kWh / 92 kW)", on_click=set_small)
                     st.button("1 Fox G-MAX (215 kWh / 100 kW)", on_click=set_medium)
                     st.button("2 Fox G-MAX (430 kWh / 200 kW)", on_click=set_large)
-                    st.button("3 Fox G-MAX (645 kWh / 300 kW)", on_click=set_xlarge)
+                    st.button("Vorgeschlagene Konfiguration (500 kWh / 1000 kW)", on_click=set_xlarge)
 
                     if 'show_custom' not in st.session_state:
                         st.session_state.show_custom = False
@@ -1693,9 +1693,9 @@ with tabsimulation:
                             min_value=1,
                             value=st.session_state.power_rating
                         )
-                    else:
-                        st.session_state.battery_capacity = 215
-                        st.session_state.power_rating = 100
+                    #else:
+                    #    st.session_state.battery_capacity = 215
+                    #    st.session_state.power_rating = 100
 
                     # Display the current values
                 st.write(f"Gewählte Kapazität: **{st.session_state.battery_capacity} kWh**")
