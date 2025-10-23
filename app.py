@@ -1776,262 +1776,255 @@ with tabsimulation:
             roi = (annual_savings_actual * battery_lifetime - total_battery_cost) / total_battery_cost * 100
 
             # --------------------------------   TABS ------------------------------------------------
-            b_without_pv = st.tabs(["Spitzenlastkappung"])
 
-            with b_without_pv:
-                #if (st.session_state.battery_capacity == 0 and st.session_state.power_rating == 0):
-                #    with st.container(border=True):
-                #        st.subheader("Bitte Batteriegröße auswählen")
-                #else:
-
-                col1, col2, col3, col4 = st.columns(4)
-                with col1:
-                    st.markdown(
-                        "<div class='metric'><div class='metric-title'>🔺 Alte Spitzenlast</div><div class='metric-value'>" + f"{peak_org:,.1f} kW" + "</div></div>",
-                        unsafe_allow_html=True)
-
-                with col2:
-                    st.markdown(
-                        "<div class='metric'><div class='metric-title'>🔻 Neue Spitzenlast</div><div class='metric-value'>" + f"{peak_peakshaving:,.1f} kW" + "</div></div>",
-                        unsafe_allow_html=True)
-
-                with col3:
-                    st.markdown(
-                        "<div class='metric'><div class='metric-title'>📉 Reduktion</div><div class='metric-value'>" +
-                        f"{(peak_reduction_peakshaving):.0f}kW   ({-(peak_reduction_peakshaving / peak_org * 100):.1f}%)" + "</div></div>",
-                        unsafe_allow_html=True)
-                with col4:
-                    st.markdown(
-                        "<div class='metric'><div class='metric-title'>💸 Ersparnis (p.a.)</div><div class='metric-value'>" + f"€{demand_charge_peakshaving * peak_reduction_peakshaving:,.1f}" + "</div></div>",
-                        unsafe_allow_html=True,
-                        help="Kalkuliert durch Spitzenlastkappung mit der Annahme einer Reduktion von " + f"{peak_reduction_peakshaving:,.1f} kW" + " und einem Leistungspreis von  " + f"€/kW{demand_charge_peakshaving:,.1f}" + " pro kW pro Jahr.")
-
-                st.write("---")
-
-                # ---------------------------------------    BATTERIE CHART OHNE PV           ---------------------------------------
-                if (peak_reduction_peakshaving) == 0 :
-                    st.warning("⚠️ Keine Lastspitzenreduktion erfolg. Die gewählte Batteriespezifikation ist zu gering für Ihr Lastprofil. \n "
-                               "Wählen Sie eine Batterie mit höherer Kapazität oder passen Sie den Grenzwert zur Spitzenlastkappung an.⚠️")
-                elif (peak_reduction_peakshaving) < 0.98 * value_peak_reduction:
-                    st.warning(f"Spitzenlast reduziert um: {peak_reduction_peakshaving:,.0f}kW"
-                                "⚠️ Die ausgewählte Batteriegröße reicht nicht aus, um die Spitze um den gewünschten Wert zu senken. \n "
-                               "Wählen Sie eine Batterie mit mehr Kapazität und Leistung oder reduzieren Sie den Grenzwert zur Spitzenlastkappung.⚠️")
-
-                legend_rename = {
-                    "load": "Last (kW)",
-                    "grid_load": "Netto Netzlast",
-                    # "battery_soc": "Batterie Ladestand",
-                    "battery_discharge": "Batterie Entladung"
-                }
-                df_peakshaving_renamed = df_peakshaving.rename(columns=legend_rename)
-
-                color_map = {
-                    "Last (kW)": "#eb1b17",
-                    "Netto Netzlast": "#11a64c",
-                    "Batterie Entladung": "#030ca8",
-                    "Batterie Ladestand": "#e64e02"
-                }
-
-
-                def add_ref_line(fig, y, text, color):
-                    fig.add_trace(
-                        go.Scatter(
-                            x=[df_peakshaving_renamed["timestamp"].min(), df_peakshaving_renamed["timestamp"].max()],
-                            y=[y, y],
-                            mode="lines",
-                            name=text,
-                            line=dict(dash="dot", color=color),
-                        )
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.markdown(
+                    "<div class='metric'><div class='metric-title'>🔺 Alte Spitzenlast</div><div class='metric-value'>" + f"{peak_org:,.1f} kW" + "</div></div>",
+                    unsafe_allow_html=True)
+    
+            with col2:
+                st.markdown(
+                    "<div class='metric'><div class='metric-title'>🔻 Neue Spitzenlast</div><div class='metric-value'>" + f"{peak_peakshaving:,.1f} kW" + "</div></div>",
+                    unsafe_allow_html=True)
+    
+            with col3:
+                st.markdown(
+                    "<div class='metric'><div class='metric-title'>📉 Reduktion</div><div class='metric-value'>" +
+                    f"{(peak_reduction_peakshaving):.0f}kW   ({-(peak_reduction_peakshaving / peak_org * 100):.1f}%)" + "</div></div>",
+                    unsafe_allow_html=True)
+            with col4:
+                st.markdown(
+                    "<div class='metric'><div class='metric-title'>💸 Ersparnis (p.a.)</div><div class='metric-value'>" + f"€{demand_charge_peakshaving * peak_reduction_peakshaving:,.1f}" + "</div></div>",
+                    unsafe_allow_html=True,
+                    help="Kalkuliert durch Spitzenlastkappung mit der Annahme einer Reduktion von " + f"{peak_reduction_peakshaving:,.1f} kW" + " und einem Leistungspreis von  " + f"€/kW{demand_charge_peakshaving:,.1f}" + " pro kW pro Jahr.")
+    
+            st.write("---")
+    
+            # ---------------------------------------    BATTERIE CHART OHNE PV           ---------------------------------------
+            if (peak_reduction_peakshaving) == 0 :
+                st.warning("⚠️ Keine Lastspitzenreduktion erfolg. Die gewählte Batteriespezifikation ist zu gering für Ihr Lastprofil. \n "
+                           "Wählen Sie eine Batterie mit höherer Kapazität oder passen Sie den Grenzwert zur Spitzenlastkappung an.⚠️")
+            elif (peak_reduction_peakshaving) < 0.98 * value_peak_reduction:
+                st.warning(f"Spitzenlast reduziert um: {peak_reduction_peakshaving:,.0f}kW"
+                            "⚠️ Die ausgewählte Batteriegröße reicht nicht aus, um die Spitze um den gewünschten Wert zu senken. \n "
+                           "Wählen Sie eine Batterie mit mehr Kapazität und Leistung oder reduzieren Sie den Grenzwert zur Spitzenlastkappung.⚠️")
+    
+            legend_rename = {
+                "load": "Last (kW)",
+                "grid_load": "Netto Netzlast",
+                # "battery_soc": "Batterie Ladestand",
+                "battery_discharge": "Batterie Entladung"
+            }
+            df_peakshaving_renamed = df_peakshaving.rename(columns=legend_rename)
+    
+            color_map = {
+                "Last (kW)": "#eb1b17",
+                "Netto Netzlast": "#11a64c",
+                "Batterie Entladung": "#030ca8",
+                "Batterie Ladestand": "#e64e02"
+            }
+    
+    
+            def add_ref_line(fig, y, text, color):
+                fig.add_trace(
+                    go.Scatter(
+                        x=[df_peakshaving_renamed["timestamp"].min(), df_peakshaving_renamed["timestamp"].max()],
+                        y=[y, y],
+                        mode="lines",
+                        name=text,
+                        line=dict(dash="dot", color=color),
                     )
-
-                fig_battery_peakshaving = go.Figure()
-
-                # Add traces
-                for col in legend_rename.values():
-                    fig_battery_peakshaving.add_trace(
-                        go.Scattergl(
-                            x=df_peakshaving_renamed["timestamp"],
-                            y=df_peakshaving_renamed[col],
-                            mode="lines",
-                            name=col,
-                            line=dict(shape="linear", color=color_map.get(col))
-                        )
-                    )
-
-
-                # Helper to add horizontal reference lines
-                def add_ref_line_old(fig, y, text, color, xref="timestamp"):
-                    fig.add_shape(
-                        type="line",
-                        x0=df_peakshaving_renamed["timestamp"].min(), x1=df_peakshaving_renamed["timestamp"].max(),
-                        y0=y, y1=y,
-                        line=dict(dash="dot", color=color)
-                    )
-                    fig.add_annotation(
-                        x=df_peakshaving_renamed["timestamp"].max(), y=y,
-                        text=text, showarrow=False,
-                        xanchor="right", yanchor="bottom",
-                        font=dict(color=color)
-                    )
-
-
-                # Conditional + fixed reference lines
-                if peak_peakshaving > (peak_org - value_peak_reduction)*1.01 :
-                    add_ref_line(fig_battery_peakshaving, peak_peakshaving,
-                                 f"Spitzenlast mit Batterie: ({peak_peakshaving:.0f}kW)", "orange")
-
-                add_ref_line(fig_battery_peakshaving, calculated_peakshaving_threshold * 0.01 * peak_org,
-                             f"Ziel Spitzenlast ({peak_org - value_peak_reduction:.1f}kW)",
-                             "red")
-
-                add_ref_line(fig_battery_peakshaving, peak_org,
-                             f"Ursprüngliche Spitzenlast ({peak_org:.0f}kW)", "grey")
-
-                # Layout
-                fig_battery_peakshaving.update_layout(
-                    title="⚡ Analyse des Lastprofils mit Spitzenlastkappung",
-                    yaxis_title="Leistung (kW)",
-                    xaxis_title="Zeit",
-                    height=500,
-                    margin=dict(l=20, r=20, t=40, b=20),
-                    legend=dict(title="Legend")
                 )
-
-                st.plotly_chart(fig_battery_peakshaving, use_container_width=True)
-
-                #####################################################
-                # st.write("---")
-                #
-                #
-                # legend_rename = {
-                #     "load": "Last (kW)",
-                #     "grid_load": "Netto Netzlast",
-                #     #"battery_soc": "Batterie Ladestand",
-                #     "battery_discharge": "Batterie Entladung"
-                # }
-                # df_bt_ps_renamed = df_bt_ps.rename(columns=legend_rename)
-                #
-                # fig_batt_exp = px.line(df_bt_ps_renamed.reset_index(), x="timestamp",
-                #                        y=list(legend_rename.values()),
-                #                        title="⚡ Analyse des Lastprofils mit Spitzenlastkappung",
-                #                        labels={"value": "Leistung (kW)", "timestamp": "Zeit",
-                #                                "battery_discharge": "Battery Entladung",
-                #                                "soc_state": "Batterie Ladestand", "variable": "Legend"},
-                #                        line_shape='spline',
-                #                        color_discrete_map={"Last (kW)": "#eb1b17", "Netto Netzlast": "#11a64c",
-                #                                            "Batterie Entladung": "#030ca8", "Batterie Ladestand": "#e64e02"})
-                #
-                # if (df_bt_ps["grid_load"].max() > calculated_peakshaving_threshold*0.01* peak_before):
-                #     fig_batt_exp.add_hline(y=df_bt_ps["grid_load"].max(),
-                #                            line_dash="dot", line_color="orange",
-                #                            annotation_text=f"Spitzenlast mit Batterie: ({df_bt_ps["grid_load"].max():.0f}kW)",
-                #                            annotation_position="bottom right",
-                #                            name="Erreichte Spitzenlast",  # Add this
-                #                            showlegend=True  # And this
-                #                            )
-                #
-                # fig_batt_exp.add_hline(y=calculated_peakshaving_threshold*0.01* peak_before,
-                #                        line_dash="dot",
-                #                        line_color="red",
-                #                        annotation_text=f"Ziel Spitzenlast ({calculated_peakshaving_threshold*0.01* peak_before:.1f}kW)",
-                #                        annotation_position="bottom left",
-                #                        name="Ziel Spitzenlast",
-                #                        showlegend=True
-                #                        )
-                #
-                # fig_batt_exp.add_hline(y=df_bt_ps["load"].max(),
-                #                        line_dash="dot", line_color="grey",
-                #                        annotation_text=f"Ursprüngliche Spitzenlast ({df_bt_ps["load"].max():.0f}kW)",
-                #                        annotation_position="top right",
-                #                        name="Ursprüngliche Spitzenlast",
-                #                        showlegend=True
-                #                        )
-                #
-                # fig_batt_exp.update_layout(height=500, margin=dict(l=20, r=20, t=40, b=20))
-                # st.plotly_chart(fig_batt_exp, use_container_width=True)
-
-
-                # fig_soc = px.line(df_bt_ps.reset_index(), x="timestamp",
-                #                        y="battery_soc",
-                #                        title="⚡ Batterie Ladezustand",
-                #                        labels={"battery_soc": "Batterie Ladestand (kWh)", "timestamp": "Zeit"},
-                #                        line_shape='spline')
-                # fig_soc.update_traces(line=dict(color='orange', width=3), name="Batterie Ladestand (kWh)", selector=dict(type='scatter'), showlegend=True)
-                # fig_soc.update_layout(
-                #     height=500,
-                #     margin=dict(l=20, r=20, t=40, b=20),
-                #     legend_title_text="Legende",
-                #     yaxis_title="Batterie Ladestand (kWh)",
-                #     xaxis_title="Zeit"
-                # )
-                # st.plotly_chart(fig_soc, use_container_width=True)
-
-
-                ####################################asddddddasssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
-
-                with st.container(border=True):
-                    st.subheader("📈 Zusammenfassung")
-                    col0, col1, col2, col3, col4 = st.columns(5)
-                    with col0:
-                        st.subheader("Verbrauch")
-                        st.metric("⚡ Gesamtverbrauch", f"{(df_peakshaving["load"].sum() / 1000 / 4):,.0f} MWh")
-
-                    with col1:
-                        st.subheader("Spitzenlast")
-                        st.metric("🔺 Spitzenlast ohne Batterie", f"{df["load"].max():,.0f} kW")
-                        st.metric("🔸 Spitzenlast mit Batterie", f"{df_peakshaving["grid_load"].max():,.0f} kW",
-                                  f"{df_peakshaving["grid_load"].max() - df["load"].max():,.0f} kW", delta_color="inverse")
-                    with col2:
-                        col2.subheader("Volllaststunden")
-                        st.metric("Ohne Batterie", f"{df_org["load"].sum() / 4 / peak_org:,.0f} h")
-                        st.metric("Mit Batterie", f"{df_org["load"].sum() / 4 / peak_peakshaving:,.0f} h")
-                    with col3:
-                        st.subheader("Finanzen")
-                        st.metric(f"💰 Jährl. Einsparungen (Peak Shaving)",
-                                  f"~€ {annual_savings_actual:,.0f}", help = f"(Leistungspreis: {demand_charge}€/kW)")
-                        st.metric("💶 Geschätzte Investmentkosten", f"~€ {total_battery_cost:,.0f}")
-                    with col4:
-                        st.subheader("ROI")
-                        st.metric("✅ Amortisationszeit", f"{payback_period:.1f} Jahre")
-                        st.metric(f"📈 ROI über {battery_lifetime} Jahre (Batterie Lebenszeit)", f"{roi:.1f}%")
-
-
-                with st.container(border=True):
-                    st.subheader("📈 Finanzielle Analyse")
-                    col2, col3, col4 = st.columns(3)
-
-                    #col1.subheader("Batteriekosten")
-                    #col1.metric("💶 Geschätzte Investmentkosten", f"~€ {total_battery_cost:,.0f}")
-
-                    col2.subheader("Ersparnis")
-                    col2.metric(f"💰 Geschätzte jährl. Einsparungen durch Peak Shaving",
-                                  f"~€ {annual_savings_actual:,.1f}", help = f"(Leistungspreis: {demand_charge}€/kW)")
-
-                    col3.subheader("Amortisationszeit")
-                    col3.metric("✅ Amortisationszeit", f"{payback_period:.1f} Jahre")
-
-                    col4.subheader("ROI")
-                    col4.metric(f"📈 ROI über {battery_lifetime} Jahre (Batterie Lebenszeit)", f"{roi:.1f}%")
-
-                    st.write("---")
-                    col_1c, col_2c, col_3c = st.columns(3)
-                    col_1c.subheader("Batteriekosten")
-                    col_1c.metric("💶 Geschätzte Investmentkosten", f"~€ {total_battery_cost:,.0f}")
-                    col_2c.subheader("Energiekosten")
-                    col_2c.metric("Arbeitspreis", f"{energy_charge_low if volllaststunden_peakshaving > 2500 else energy_charge_high:.2f} €")
-                    col_3c.subheader(" ")
-                    col_3c.metric("Leistungspreis", f"{demand_charge_high if volllaststunden_peakshaving > 2500 else demand_charge_low:.1f} €")
-
-                with st.container(border=True):
-                    st.subheader("🔋 Batterie Analyse")
-                    col_b_1, col_b_2, col_b_3 = st.columns(3)
-
-                    col_b_1.subheader("🔋 Geladene Energie")
-                    charge_energy = df_peakshaving["battery_charge"].sum()
-                    col_b_1.metric("Aus Netz", f"{charge_energy:,.1f}")
-
-                    col_b_2.subheader("🪫 Entladene Energie")
-                    discharge_energy = df_peakshaving["battery_discharge"].sum()
-                    col_b_2.metric("Für Peakshaving", f"{discharge_energy:,.1f}")
-
-#################################################################################################################################################################
+    
+            fig_battery_peakshaving = go.Figure()
+    
+            # Add traces
+            for col in legend_rename.values():
+                fig_battery_peakshaving.add_trace(
+                    go.Scattergl(
+                        x=df_peakshaving_renamed["timestamp"],
+                        y=df_peakshaving_renamed[col],
+                        mode="lines",
+                        name=col,
+                        line=dict(shape="linear", color=color_map.get(col))
+                    )
+                )
+    
+    
+            # Helper to add horizontal reference lines
+            def add_ref_line_old(fig, y, text, color, xref="timestamp"):
+                fig.add_shape(
+                    type="line",
+                    x0=df_peakshaving_renamed["timestamp"].min(), x1=df_peakshaving_renamed["timestamp"].max(),
+                    y0=y, y1=y,
+                    line=dict(dash="dot", color=color)
+                )
+                fig.add_annotation(
+                    x=df_peakshaving_renamed["timestamp"].max(), y=y,
+                    text=text, showarrow=False,
+                    xanchor="right", yanchor="bottom",
+                    font=dict(color=color)
+                )
+    
+    
+            # Conditional + fixed reference lines
+            if peak_peakshaving > (peak_org - value_peak_reduction)*1.01 :
+                add_ref_line(fig_battery_peakshaving, peak_peakshaving,
+                             f"Spitzenlast mit Batterie: ({peak_peakshaving:.0f}kW)", "orange")
+    
+            add_ref_line(fig_battery_peakshaving, calculated_peakshaving_threshold * 0.01 * peak_org,
+                         f"Ziel Spitzenlast ({peak_org - value_peak_reduction:.1f}kW)",
+                         "red")
+    
+            add_ref_line(fig_battery_peakshaving, peak_org,
+                         f"Ursprüngliche Spitzenlast ({peak_org:.0f}kW)", "grey")
+    
+            # Layout
+            fig_battery_peakshaving.update_layout(
+                title="⚡ Analyse des Lastprofils mit Spitzenlastkappung",
+                yaxis_title="Leistung (kW)",
+                xaxis_title="Zeit",
+                height=500,
+                margin=dict(l=20, r=20, t=40, b=20),
+                legend=dict(title="Legend")
+            )
+    
+            st.plotly_chart(fig_battery_peakshaving, use_container_width=True)
+    
+            #####################################################
+            # st.write("---")
+            #
+            #
+            # legend_rename = {
+            #     "load": "Last (kW)",
+            #     "grid_load": "Netto Netzlast",
+            #     #"battery_soc": "Batterie Ladestand",
+            #     "battery_discharge": "Batterie Entladung"
+            # }
+            # df_bt_ps_renamed = df_bt_ps.rename(columns=legend_rename)
+            #
+            # fig_batt_exp = px.line(df_bt_ps_renamed.reset_index(), x="timestamp",
+            #                        y=list(legend_rename.values()),
+            #                        title="⚡ Analyse des Lastprofils mit Spitzenlastkappung",
+            #                        labels={"value": "Leistung (kW)", "timestamp": "Zeit",
+            #                                "battery_discharge": "Battery Entladung",
+            #                                "soc_state": "Batterie Ladestand", "variable": "Legend"},
+            #                        line_shape='spline',
+            #                        color_discrete_map={"Last (kW)": "#eb1b17", "Netto Netzlast": "#11a64c",
+            #                                            "Batterie Entladung": "#030ca8", "Batterie Ladestand": "#e64e02"})
+            #
+            # if (df_bt_ps["grid_load"].max() > calculated_peakshaving_threshold*0.01* peak_before):
+            #     fig_batt_exp.add_hline(y=df_bt_ps["grid_load"].max(),
+            #                            line_dash="dot", line_color="orange",
+            #                            annotation_text=f"Spitzenlast mit Batterie: ({df_bt_ps["grid_load"].max():.0f}kW)",
+            #                            annotation_position="bottom right",
+            #                            name="Erreichte Spitzenlast",  # Add this
+            #                            showlegend=True  # And this
+            #                            )
+            #
+            # fig_batt_exp.add_hline(y=calculated_peakshaving_threshold*0.01* peak_before,
+            #                        line_dash="dot",
+            #                        line_color="red",
+            #                        annotation_text=f"Ziel Spitzenlast ({calculated_peakshaving_threshold*0.01* peak_before:.1f}kW)",
+            #                        annotation_position="bottom left",
+            #                        name="Ziel Spitzenlast",
+            #                        showlegend=True
+            #                        )
+            #
+            # fig_batt_exp.add_hline(y=df_bt_ps["load"].max(),
+            #                        line_dash="dot", line_color="grey",
+            #                        annotation_text=f"Ursprüngliche Spitzenlast ({df_bt_ps["load"].max():.0f}kW)",
+            #                        annotation_position="top right",
+            #                        name="Ursprüngliche Spitzenlast",
+            #                        showlegend=True
+            #                        )
+            #
+            # fig_batt_exp.update_layout(height=500, margin=dict(l=20, r=20, t=40, b=20))
+            # st.plotly_chart(fig_batt_exp, use_container_width=True)
+    
+    
+            # fig_soc = px.line(df_bt_ps.reset_index(), x="timestamp",
+            #                        y="battery_soc",
+            #                        title="⚡ Batterie Ladezustand",
+            #                        labels={"battery_soc": "Batterie Ladestand (kWh)", "timestamp": "Zeit"},
+            #                        line_shape='spline')
+            # fig_soc.update_traces(line=dict(color='orange', width=3), name="Batterie Ladestand (kWh)", selector=dict(type='scatter'), showlegend=True)
+            # fig_soc.update_layout(
+            #     height=500,
+            #     margin=dict(l=20, r=20, t=40, b=20),
+            #     legend_title_text="Legende",
+            #     yaxis_title="Batterie Ladestand (kWh)",
+            #     xaxis_title="Zeit"
+            # )
+            # st.plotly_chart(fig_soc, use_container_width=True)
+    
+    
+            ####################################asddddddasssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
+    
+            with st.container(border=True):
+                st.subheader("📈 Zusammenfassung")
+                col0, col1, col2, col3, col4 = st.columns(5)
+                with col0:
+                    st.subheader("Verbrauch")
+                    st.metric("⚡ Gesamtverbrauch", f"{(df_peakshaving["load"].sum() / 1000 / 4):,.0f} MWh")
+    
+                with col1:
+                    st.subheader("Spitzenlast")
+                    st.metric("🔺 Spitzenlast ohne Batterie", f"{df["load"].max():,.0f} kW")
+                    st.metric("🔸 Spitzenlast mit Batterie", f"{df_peakshaving["grid_load"].max():,.0f} kW",
+                              f"{df_peakshaving["grid_load"].max() - df["load"].max():,.0f} kW", delta_color="inverse")
+                with col2:
+                    col2.subheader("Volllaststunden")
+                    st.metric("Ohne Batterie", f"{df_org["load"].sum() / 4 / peak_org:,.0f} h")
+                    st.metric("Mit Batterie", f"{df_org["load"].sum() / 4 / peak_peakshaving:,.0f} h")
+                with col3:
+                    st.subheader("Finanzen")
+                    st.metric(f"💰 Jährl. Einsparungen (Peak Shaving)",
+                              f"~€ {annual_savings_actual:,.0f}", help = f"(Leistungspreis: {demand_charge}€/kW)")
+                    st.metric("💶 Geschätzte Investmentkosten", f"~€ {total_battery_cost:,.0f}")
+                with col4:
+                    st.subheader("ROI")
+                    st.metric("✅ Amortisationszeit", f"{payback_period:.1f} Jahre")
+                    st.metric(f"📈 ROI über {battery_lifetime} Jahre (Batterie Lebenszeit)", f"{roi:.1f}%")
+    
+    
+            with st.container(border=True):
+                st.subheader("📈 Finanzielle Analyse")
+                col2, col3, col4 = st.columns(3)
+    
+                #col1.subheader("Batteriekosten")
+                #col1.metric("💶 Geschätzte Investmentkosten", f"~€ {total_battery_cost:,.0f}")
+    
+                col2.subheader("Ersparnis")
+                col2.metric(f"💰 Geschätzte jährl. Einsparungen durch Peak Shaving",
+                              f"~€ {annual_savings_actual:,.1f}", help = f"(Leistungspreis: {demand_charge}€/kW)")
+    
+                col3.subheader("Amortisationszeit")
+                col3.metric("✅ Amortisationszeit", f"{payback_period:.1f} Jahre")
+    
+                col4.subheader("ROI")
+                col4.metric(f"📈 ROI über {battery_lifetime} Jahre (Batterie Lebenszeit)", f"{roi:.1f}%")
+    
+                st.write("---")
+                col_1c, col_2c, col_3c = st.columns(3)
+                col_1c.subheader("Batteriekosten")
+                col_1c.metric("💶 Geschätzte Investmentkosten", f"~€ {total_battery_cost:,.0f}")
+                col_2c.subheader("Energiekosten")
+                col_2c.metric("Arbeitspreis", f"{energy_charge_low if volllaststunden_peakshaving > 2500 else energy_charge_high:.2f} €")
+                col_3c.subheader(" ")
+                col_3c.metric("Leistungspreis", f"{demand_charge_high if volllaststunden_peakshaving > 2500 else demand_charge_low:.1f} €")
+    
+            with st.container(border=True):
+                st.subheader("🔋 Batterie Analyse")
+                col_b_1, col_b_2, col_b_3 = st.columns(3)
+    
+                col_b_1.subheader("🔋 Geladene Energie")
+                charge_energy = df_peakshaving["battery_charge"].sum()
+                col_b_1.metric("Aus Netz", f"{charge_energy:,.1f}")
+    
+                col_b_2.subheader("🪫 Entladene Energie")
+                discharge_energy = df_peakshaving["battery_discharge"].sum()
+                col_b_2.metric("Für Peakshaving", f"{discharge_energy:,.1f}")
+    
+    #################################################################################################################################################################
