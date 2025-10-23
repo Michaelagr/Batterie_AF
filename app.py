@@ -990,7 +990,7 @@ autarky_ratio = 0
 with st.sidebar:
         # Logo in sidebar
     try:
-        st.image("AF_Logo.gif", width=150)
+        st.image("AF_Logo.png", width=150)
         st.markdown("---")
     except:
         pass  # Logo file not found, continue without it
