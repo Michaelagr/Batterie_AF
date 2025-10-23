@@ -1674,28 +1674,26 @@ with tabsimulation:
             with st.container(border=True):
 
                 st.markdown("### 🔧🔋 Batterie")
-                with st.expander("Auswahl"):
-                    # Create simple buttons stacked vertically
-                    st.button("Voltfang (90 kWh / 92 kW)", on_click=set_small)
-                    st.button("1 Fox G-MAX (215 kWh / 100 kW)", on_click=set_medium)
-                    st.button("2 Fox G-MAX (430 kWh / 200 kW)", on_click=set_large)
-                    st.button("Vorgeschlagene Konfiguration (500 kWh / 1000 kW)", on_click=set_xlarge)
 
-                    if 'show_custom' not in st.session_state:
-                        st.session_state.show_custom = False
-                    st.button("Eigene Konfiguration", on_click=set_custom)
+                # Create simple buttons stacked vertically
+                st.button("Voltfang (90 kWh / 92 kW)", on_click=set_small)
+                st.button("1 Fox G-MAX (215 kWh / 100 kW)", on_click=set_medium)
+                st.button("2 Fox G-MAX (430 kWh / 200 kW)", on_click=set_large)
+                st.button("Vorgeschlagene Konfiguration (500 kWh / 1000 kW)", on_click=set_xlarge)
 
-                    if st.session_state.show_custom:
-                        st.session_state.battery_capacity = st.number_input("Kapazität (kWh)", min_value=1, value=st.session_state.battery_capacity)
+                if 'show_custom' not in st.session_state:
+                    st.session_state.show_custom = False
+                st.button("Eigene Konfiguration", on_click=set_custom)
 
-                        st.session_state.power_rating = st.number_input(
-                            "Leistung (kW)",
-                            min_value=1,
-                            value=st.session_state.power_rating
-                        )
-                    #else:
-                    #    st.session_state.battery_capacity = 215
-                    #    st.session_state.power_rating = 100
+                if st.session_state.show_custom:
+                    st.session_state.battery_capacity = st.number_input("Kapazität (kWh)", min_value=1, value=st.session_state.battery_capacity)
+
+                    st.session_state.power_rating = st.number_input(
+                        "Leistung (kW)",
+                        min_value=1,
+                        value=st.session_state.power_rating
+                    )
+
 
                     # Display the current values
                 st.write(f"Gewählte Kapazität: **{st.session_state.battery_capacity} kWh**")
@@ -1711,10 +1709,23 @@ with tabsimulation:
                 st.subheader("🔻 Spitzenreduktion")
                 st.write(f"Max. Reduktion mit gewählter Batterie: **{st.session_state.power_rating}kW**")
 
+                reduction = 0
+                if st.session_state.power_rating == 1000:
+                    reduction = 180
+                elif st.session_state.power_rating == 200:
+                    reduction = 170    
+                elif st.session_state.power_rating < int(0.3 * peak_load):
+                    reduction = st.session_state.power_rating
+                else:
+                    reduction = int(0.3 * peak_load)
+
+
+                #reduction = st.session_state.power_rating if st.session_state.power_rating < int(0.3 * peak_load) else int(0.3 * peak_load)
+
                 value_peak_reduction = st.number_input("Reduktion um (kW) ",
                                                        0,
                                                        int(peak_load) * 1000000,
-                                                       st.session_state.power_rating if st.session_state.power_rating < int(0.3 * peak_load) else int(0.3 * peak_load))
+                                                       reduction)
 
                 calculated_peakshaving_threshold = (peak_load - value_peak_reduction) / peak_load *100
                 if pv_total > 0:
